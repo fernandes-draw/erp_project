@@ -1,0 +1,148 @@
+<html>
+  ERP JM
+</html>
+{% block contante %}
+  <nav>
+    <a href="#">ERP JM</a>
+    <span>Welcome, {{ user.first_name|default:user.username }}</span>
+    <a href="{% url "logout" %}">Logout</a>
+  </nav>
+  <h2>Dashboard</h2>
+  <p>
+    Assigned roles: <strong>{{ roles|join:", " }}</strong>
+  </p>
+  {% comment %} Customers Roles {% endcomment %}
+  <div style="display: flex; flex-wrap: wrap; gap: 10px;">
+    {% if permission.customer > 0 %}
+      <div style="border: 1px solid #000; padding: 10px; width: 200px;">
+        <h3>Customers</h3>
+        <p>
+          {% if permission.customers == 1 %}
+            View Only
+          {% else %}
+            Read and write
+          {% endif %}
+        </p>
+        <a href="#">Access</a>
+      </div>
+    {% endif %}
+  </div>
+  {% comment %} Suppliers Roles {% endcomment %}
+  <div style="display: flex; flex-wrap: wrap; gap: 10px;">
+    {% if permission.customer > 0 %}
+      <div style="border: 1px solid #000; padding: 10px; width: 200px;">
+        <h3>Suppliers</h3>
+        <p>
+          {% if permission.suppliers == 1 %}
+            View Only
+          {% else %}
+            Read and write
+          {% endif %}
+        </p>
+        <a href="#">Access</a>
+      </div>
+    {% endif %}
+  </div>
+  {% comment %} Materials Roles {% endcomment %}
+  <div style="display: flex; flex-wrap: wrap; gap: 10px;">
+    {% if permission.customer > 0 %}
+      <div style="border: 1px solid #000; padding: 10px; width: 200px;">
+        <h3>Materials</h3>
+        <p>
+          {% if permission.materials == 1 %}
+            View Only
+          {% else %}
+            Read and write
+          {% endif %}
+        </p>
+        <a href="#">Access</a>
+      </div>
+    {% endif %}
+  </div>
+  {% comment %} Purchases Roles {% endcomment %}
+  <div style="display: flex; flex-wrap: wrap; gap: 10px;">
+    {% if permission.customer > 0 %}
+      <div style="border: 1px solid #000; padding: 10px; width: 200px;">
+        <h3>Purchases</h3>
+        <p>
+          {% if permission.purchases == 1 %}
+            View Only
+          {% else %}
+            Read and write
+          {% endif %}
+        </p>
+        <a href="#">Access</a>
+      </div>
+    {% endif %}
+  </div>
+  {% comment %} Sales Roles {% endcomment %}
+  <div style="display: flex; flex-wrap: wrap; gap: 10px;">
+    {% if permission.customer > 0 %}
+      <div style="border: 1px solid #000; padding: 10px; width: 200px;">
+        <h3>Sales</h3>
+        <p>
+          {% if permission.sales == 1 %}
+            View Only
+          {% else %}
+            Read and write
+          {% endif %}
+        </p>
+        <a href="#">Access</a>
+      </div>
+    {% endif %}
+  </div>
+  {% comment %} Inventory Roles {% endcomment %}
+  <div style="display: flex; flex-wrap: wrap; gap: 10px;">
+    {% if permission.customer > 0 %}
+      <div style="border: 1px solid #000; padding: 10px; width: 200px;">
+        <h3>Inventory</h3>
+        <p>
+          {% if permission.inventory == 1 %}
+            View Only
+          {% else %}
+            Read and write
+          {% endif %}
+        </p>
+        <a href="#">Access</a>
+      </div>
+    {% endif %}
+  </div>
+  {% comment %} Accounting Roles {% endcomment %}
+  <div style="display: flex; flex-wrap: wrap; gap: 10px;">
+    {% if permission.customer > 0 %}
+      <div style="border: 1px solid #000; padding: 10px; width: 200px;">
+        <h3>Accounting</h3>
+        <p>
+          {% if permission.accounting == 1 %}
+            View Only
+          {% else %}
+            Read and write
+          {% endif %}
+        </p>
+        <a href="#">Access</a>
+      </div>
+    {% endif %}
+  </div>
+  {% comment %} Reporting Roles {% endcomment %}
+  <div style="display: flex; flex-wrap: wrap; gap: 10px;">
+    {% if permission.customer > 0 %}
+      <div style="border: 1px solid #000; padding: 10px; width: 200px;">
+        <h3>Reporting</h3>
+        <p>
+          {% if permission.reporting == 1 %}
+            View Only
+          {% else %}
+            Read and write
+          {% endif %}
+        </p>
+        <a href="#">Access</a>
+      </div>
+    {% endif %}
+  </div>
+  {% if permissions.customers == 0 and permissions.suppliers == 0 and permission.materials == 0 and permission.purchases == 0 and permission.sales == 0 and permission.inventory == 0 and permission.accounting == 0 and permission.reporting == 0 %}
+    <div style="border: 1px solid red; padding: 10px; margin-top: 20px;">
+      <h4>No permission assigned.</h4>
+      <p>You currently don't have permissions to access any system module. Contact your administrator to request access.</p>
+    </div>
+  {% endif %}
+{% endblock contante %}
