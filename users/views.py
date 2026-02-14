@@ -7,7 +7,7 @@ from .models import UserRole, Role
 
 
 def login_view(request):
-    if request.User.is_authenticated:
+    if request.user.is_authenticated:
         return redirect("dashboard")
 
     if request.method == "POST":
@@ -25,10 +25,10 @@ def login_view(request):
             else:
                 messages.error(request, "Invalid username or password.")
 
-        else:
-            form = LoginForm()
+    else:
+        form = LoginForm()
 
-        return render(request, "users/login.html", {"form": form})
+    return render(request, "users/login.html", {"form": form})
 
 
 @login_required

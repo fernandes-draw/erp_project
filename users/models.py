@@ -10,7 +10,7 @@ class User(AbstractUser):
     USERNAME_FIELD = "username"
 
     class Meta:
-        table = "users"
+        db_table = "users"
         verbose_name = "User"
         verbose_name_plural = "Users"
 
@@ -33,7 +33,7 @@ class Role(models.Model):
     reporting = models.IntegerField(choices=PERMISSION_CHOICES, default=0)
 
     class Meta:
-        table = "roles"
+        db_table = "roles"
         verbose_name = "Role"
         verbose_name_plural = "Roles"
 
@@ -46,7 +46,7 @@ class UserRole(models.Model):
     role = models.ForeignKey(Role, on_delete=models.CASCADE)
 
     class Meta:
-        table = "user_roles"
+        db_table = "user_roles"
         verbose_name = "User Role"
         verbose_name_plural = "User Roles"
         unique_together = ("user_id", "role")
