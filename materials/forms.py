@@ -9,4 +9,14 @@ class MaterialForm(forms.ModelForm):
             "id_material",
             "name",
             "description",
+            "unit",
+            "material_type",
+            "status",
         ]
+
+
+class CsvUploadForm(forms.Form):
+    csv_file = forms.FileField(
+        label="Suppliers CSV File",
+        help_text="The file must contain headers that match the model fields.",
+    )
