@@ -28,6 +28,7 @@ INSTALLED_APPS = [
     "core",
     "users",
     "materials",
+    "suppliers",
 ]
 
 AUTH_USER_MODEL = "users.User"
@@ -57,6 +58,7 @@ TEMPLATES = [
                 "django.template.context_processors.request",
                 "django.contrib.auth.context_processors.auth",
                 "django.contrib.messages.context_processors.messages",
+                "core.context_processors.get_permissions",
             ],
         },
     },

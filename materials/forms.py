@@ -9,7 +9,4 @@ class MaterialForm(forms.ModelForm):
             "id_material",
             "name",
             "description",
-            "unit",
-            "material_type",
-            "status",
         ]
