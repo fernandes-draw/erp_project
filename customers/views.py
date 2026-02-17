@@ -1,5 +1,7 @@
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth.decorators import login_required
+
+from core.models import Country, Currency, Status
 from .models import Customer
 from .forms import CustomerForm, CsvUploadForm
 from django.core.paginator import Paginator
@@ -36,9 +38,15 @@ def customers_list(request):
     if name:
         customers_list = customers_list.filter(name__icontains=name)
     if country:
-        customers_list = customers_list.filter(country__icontains=country)
+        try:
+            customers_list = customers_list.filter(country__name__iexact=country)
+        except Country.DoesNotExist:
+            customers_list = customers_list.none()
     if status:
-        customers_list = customers_list.filter(status=status)
+        try:
+            customers_list = customers_list.filter(status__name__iexact=status)
+        except Status.DoesNotExist:
+            customers_list = customers_list.none()
 
     if request.GET.get("export") == "csv":
         response = HttpResponse(content_type="text/csv")
@@ -108,7 +116,23 @@ def customers_list(request):
     page_number = request.GET.get("page")
     page_obj = paginator.get_page(page_number)
 
-    return render(request, "customers/customers_list.html", {"page_obj": page_obj})
+    try:
+        all_statuses = Status.objects.all().order_by("name")
+    except NameError:
+        all_statuses = []
+
+    try:
+        all_countries = Country.objects.all().order_by("name")
+    except NameError:
+        all_countries = []
+
+    context = {
+        "page_obj": page_obj,
+        "all_statuses": all_statuses,
+        "all_countries": all_countries,
+    }
+
+    return render(request, "customers/customers_list.html", context)
 
 
 @login_required
@@ -215,6 +239,31 @@ def customer_bulk_create(request):
         if form.is_valid():
             csv_file = form.cleaned_data["csv_file"]
 
+            status_map = {
+                status.name.strip().lower(): status for status in Status.objects.all()
+            }
+
+            # Mapeamento robusto
+            countries_qs = Country.objects.all()
+            country_map = {}
+
+            for c in countries_qs:
+                if c.symbol:
+                    country_map[c.symbol.strip().lower()] = c
+                if c.name:
+                    country_map[c.name.strip().lower()] = c
+
+            currency_map = {
+                currency.symbol.strip().lower(): currency
+                for currency in Currency.objects.all()
+            }
+            currency_map.update(
+                {
+                    currency.name.strip().lower(): currency
+                    for currency in Currency.objects.all()
+                }
+            )
+
             try:
                 data_set = csv_file.read().decode("UTF-8")
             except UnicodeDecodeError:
@@ -247,6 +296,57 @@ def customer_bulk_create(request):
                 for key, value in row.items():
                     cleaned_value = value.strip() if isinstance(value, str) else value
                     form_data[key] = cleaned_value
+
+                country_value = form_data.get("country", "").strip().lower()
+                country_obj = country_map.get(country_value)
+
+                if country_obj:
+                    form_data["country"] = country_obj.pk
+                else:
+                    error_records.append(
+                        {
+                            "row": row_number,
+                            "data": row,
+                            "errors": {
+                                "country": f'Country "{country_value}" not found or invalid.'
+                            },
+                        }
+                    )
+                    continue
+
+                currency_value = form_data.get("currency", "").strip().lower()
+                currency_obj = currency_map.get(currency_value)
+
+                if currency_obj:
+                    form_data["currency"] = currency_obj.pk
+                else:
+                    error_records.append(
+                        {
+                            "row": row_number,
+                            "data": row,
+                            "errors": {
+                                "currency": f'Currency "{currency_value}" not found or invalid.'
+                            },
+                        }
+                    )
+                    continue
+
+                status_value = form_data.get("status", "").strip().lower()
+                status_obj = status_map.get(status_value)
+
+                if status_obj:
+                    form_data["status"] = status_obj.pk
+                else:
+                    error_records.append(
+                        {
+                            "row": row_number,
+                            "data": row,
+                            "errors": {
+                                "status": f'Status "{status_value}" not found or invalid.'
+                            },
+                        }
+                    )
+                    continue
 
                 form = CustomerForm(form_data)
 

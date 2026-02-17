@@ -1,8 +1,8 @@
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth.decorators import login_required
 
-from core.models import Status
-from .models import Country, Currency, Supplier
+from core.models import Country, Currency, Status
+from .models import Supplier
 from .forms import SupplierForm, CsvUploadForm
 from django.core.paginator import Paginator
 from django.http import HttpResponse
@@ -252,20 +252,6 @@ def supplier_bulk_create(request):
                     country_map[c.symbol.strip().lower()] = c
                 if c.name:
                     country_map[c.name.strip().lower()] = c
-
-            # Debug para ver se o mapa foi preenchido
-            print(f"DEBUG: Países carregados no mapa: {list(country_map.keys())[:5]}")
-
-            # country_map = {
-            #     country.symbol.strip().lower(): country
-            #     for country in Country.objects.all()
-            # }
-            # country_map.update(
-            #     {
-            #         country.name.strip().lower(): country
-            #         for country in Country.objects.all()
-            #     }
-            # )
 
             currency_map = {
                 currency.symbol.strip().lower(): currency
