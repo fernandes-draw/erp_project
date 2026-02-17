@@ -2,7 +2,7 @@ from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth.decorators import login_required
 
 from core.models import Status
-from .models import Country, Supplier
+from .models import Country, Currency, Supplier
 from .forms import SupplierForm, CsvUploadForm
 from django.core.paginator import Paginator
 from django.http import HttpResponse
@@ -243,25 +243,38 @@ def supplier_bulk_create(request):
                 status.name.strip().lower(): status for status in Status.objects.all()
             }
 
-            country_map = {
-                country.symbol.strip().lower(): country
-                for country in Country.objects.all()
-            }
-            country_map.update(
-                {
-                    country.name.strip().lower(): country
-                    for country in Country.objects.all()
-                }
-            )
+            # Mapeamento robusto
+            countries_qs = Country.objects.all()
+            country_map = {}
+
+            for c in countries_qs:
+                if c.symbol:
+                    country_map[c.symbol.strip().lower()] = c
+                if c.name:
+                    country_map[c.name.strip().lower()] = c
+
+            # Debug para ver se o mapa foi preenchido
+            print(f"DEBUG: Países carregados no mapa: {list(country_map.keys())[:5]}")
+
+            # country_map = {
+            #     country.symbol.strip().lower(): country
+            #     for country in Country.objects.all()
+            # }
+            # country_map.update(
+            #     {
+            #         country.name.strip().lower(): country
+            #         for country in Country.objects.all()
+            #     }
+            # )
 
             currency_map = {
                 currency.symbol.strip().lower(): currency
-                for currency in Country.objects.all()
+                for currency in Currency.objects.all()
             }
             currency_map.update(
                 {
                     currency.name.strip().lower(): currency
-                    for currency in Country.objects.all()
+                    for currency in Currency.objects.all()
                 }
             )
 
@@ -298,7 +311,7 @@ def supplier_bulk_create(request):
                     cleaned_value = value.strip() if isinstance(value, str) else value
                     form_data[key] = cleaned_value
 
-                country_value = form.data.get("country", "").strip().lower()
+                country_value = form_data.get("country", "").strip().lower()
                 country_obj = country_map.get(country_value)
 
                 if country_obj:
@@ -315,7 +328,7 @@ def supplier_bulk_create(request):
                     )
                     continue
 
-                currency_value = form.data.get("currency", "").strip().lower()
+                currency_value = form_data.get("currency", "").strip().lower()
                 currency_obj = currency_map.get(currency_value)
 
                 if currency_obj:
@@ -332,7 +345,7 @@ def supplier_bulk_create(request):
                     )
                     continue
 
-                status_value = form.data.get("status", "").strip().lower()
+                status_value = form_data.get("status", "").strip().lower()
                 status_obj = status_map.get(status_value)
 
                 if status_obj:

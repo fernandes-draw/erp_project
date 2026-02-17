@@ -38,9 +38,7 @@ def materials_list(request):
         materials_list = materials_list.filter(name__icontains=name)
     if material_type:
         try:
-            materials_list = materials_list.filter(
-                material_type__name__iexact=material_type
-            )
+            materials_list = materials_list.filter( material_type__name__iexact=material_type)
         except MaterialType.DoesNotExist:
             materials_list = materials_list.none()
     if status:
